@@ -155,8 +155,18 @@ def parse(text, max_bytes=MAX_BYTES):
 
 
 def address_range(value):
+    def parse_piece(piece):
+        if not isinstance(piece, str):
+            raise ValueError
+        piece = piece.strip()
+        if re.fullmatch(r'[+-]?0[xX][0-9a-fA-F]+', piece):
+            return int(piece, 16)
+        if re.fullmatch(r'[+-]?[0-9]+', piece):
+            return int(piece, 10)
+        raise ValueError
+
     try:
-        start, end = [int(piece, 0) for piece in value.split(':')]
+        start, end = [parse_piece(piece) for piece in value.split(':')]
     except (ValueError, AttributeError):
         raise ValueError('range must be START:END_EXCLUSIVE (decimal or 0x hex)')
     if not 0 <= start < end <= 0x100000000:

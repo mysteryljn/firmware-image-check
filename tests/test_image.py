@@ -110,11 +110,13 @@ class ImageTests(unittest.TestCase):
     def test_ranges_and_policies(self):
         value = image(ihex(0, b'abcd'))
         self.assertEqual(address_range('0x0:4'), (0,4))
+        self.assertEqual(address_range('010:020'), (10, 20))
+        self.assertEqual(address_range('0X10:0x20'), (16, 32))
         self.assertEqual(policy(value, [(0,2),(2,4)]), [])
         self.assertEqual(len(policy(value, [(0,3)], [(3,4)], 3, True)), 4)
 
     def test_invalid_range(self):
-        for text in ('0:0', '2:1', '0:0x100000001', 'word', '-1:2'):
+        for text in ('0:0', '2:1', '0:0x100000001', 'word', '-1:2', '0o10:20', '0x:20'):
             with self.subTest(text=text), self.assertRaises(ValueError):
                 address_range(text)
 
